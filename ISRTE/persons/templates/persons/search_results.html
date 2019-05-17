@@ -1,0 +1,15 @@
+{% extends "persons/wrapper.html" %}
+{% block content_wrapper %}
+    <p>You searched for: <strong>{{ query }}</strong></p>
+
+    {% if Criminals %}
+        <p>Found {{ Criminals|length }} criminal{{ Criminals|pluralize }}.</p>
+        <ul>
+            {% for criminal in Criminals %}
+            <a href="{% url 'criminal_single_url' pk=criminal.id %}"><li>{{ criminal.last_name }} {{ criminal.first_name}}</li></a>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No criminal matched your search criteria.</p>
+    {% endif %}
+{% endblock content_wrapper %}

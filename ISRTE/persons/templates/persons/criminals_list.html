@@ -1,0 +1,51 @@
+{% extends "persons/wrapper.html" %}
+
+{% block content_wrapper %}
+
+<!-- Название страницы -->
+<!-- Название стобцов-->
+<div class="row">
+    <div class="col-lg-9" style="margin-right:100px">
+        <div class="row rounded bg-secondary">
+            <div class="col-md-4 col-lg-4">
+                <p class="font-weight-bold">ФИО</p>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <p class="font-weight-bold">Дата рождения</p>
+            </div>
+            <div class="col-md-2 col-lg-2">
+                <p class="font-weight-bold">ИНН</p>
+            </div>
+            <div class="col-md-2 col-lg-2">
+                <p class="font-weight-bold">ИНН</p>
+            </div>
+        </div>
+
+        <!-- Список террористов -->
+        {%for criminal in criminals %}
+
+        <div class="row">
+            <div class="col-md-4 col-lg-4">
+                <a class="text-muted" href="{{criminal.get_absolute_url}}"> {{criminal.last_name}}
+                    {{criminal.first_name}} {{criminal.patronymic}}</a></h2>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <p class="text-muted">{{ criminal.birthday }}</p>
+            </div>
+            <div class="col-md-2 col-lg-2">
+                <p class="text-muted">{{ criminal.INN }}</p>
+            </div>
+            <div class="col-md-2 col-lg-2">
+                <p class="text-muted">{{ criminal.INN }}</p>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+    <div class="col-lg-2 btn">
+        <a href="create/" class="btn btn-success">Добавить</a>
+    </div>
+</div>
+
+
+{% endblock content_wrapper %}

@@ -1,0 +1,36 @@
+{% extends "persons/wrapper.html" %}
+
+{% block content_wrapper %}
+
+<!-- Название страницы -->
+<!-- Название стобцов-->
+<div class="row bg-secondary">
+    <div class="col-md-4 col-lg-4">
+        <p class="font-weight-bold">ФИО</p>
+    </div>
+    <div class="col-md-3 col-lg-3">
+        <p class="font-weight-bold">Дата рождения</p>
+    </div>
+    <div class="col-md-2 col-lg-3">
+        <p class="font-weight-bold">ИНН</p>
+    </div>
+</div>
+
+<!-- Список террористов -->
+{%for citizen in citizens %}
+
+<div class="row">
+    <div class="col-md-4 col-lg-4">
+        <a class="text-muted" href="{% url 'citizen_single' pk=citizen.id %}"> {{citizen.last_name}} {{citizen.first_name}} {{citizen.patronymic}}</a></h2>
+    </div>
+    <div class="col-md-3 col-lg-3">
+        <p class="text-muted">{{ citizen.birthday }}</p>
+    </div>
+    <div class="col-md-2 col-lg-3">
+        <p class="text-muted">{{ citizen.INN }}</p>
+    </div>
+</div>
+
+{% endfor %}
+
+{% endblock content_wrapper %}

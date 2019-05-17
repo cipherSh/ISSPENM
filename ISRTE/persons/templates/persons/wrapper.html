@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row blog-header navbar-container bg-dark rounded text-light justify-content-center">
+        <a class="navbar-brand">Реестр</a>
+    </div>
+    <hr>
+    <!--Поиск -->
+        <form action="/persons/search/" method="get">
+            <div class="row form-group">
+                <div class="col-lg-11 m-0">
+                    <input type="text" class="form-control" name="text">
+                </div>
+                <div class="col-lg-1 m-0">
+                    <input type="submit" class="btn btn-primary" value="Поиск">
+                </div>
+            </div>
+        </form>
+    <hr>
+    <div class="row" style="min-height:600px">
+        <div class="col-md-9 col-lg-12 content-container pl-4 pt-2 pr-4">
+            {% block content_wrapper %}
+
+            {% endblock content_wrapper %}
+        </div>
+    </div>
+{% endblock content %}
