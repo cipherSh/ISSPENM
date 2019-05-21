@@ -1,41 +1,54 @@
 {% extends "persons/wrapper.html" %}
 {% load staticfiles %}
 {% block title %}{{ criminal.last_name }} {{ criminal.first_name }} {{ criminal.patronymic }}{% endblock title %}
+{% block show_list %}
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"><a href="{% url 'criminals_list' %}">Показать весь список</a></div>
+</div>
+{% endblock %}
 {% block content_wrapper %}
 
 
-<div class="row border rounded mb-5">
+<div class="row border rounded mb-5" >
     <!-- ФИО -->
-    <div class="col-lg-12 d-flex justify-content-center text-align-center">
-        <div>
-            <h2>{{ criminal }}</h2>
-        </div>
-        <div class="row d-flex justify-content-end">
-            <button type="button" class="btn btn-success btn-block btn-sm">{{ criminal.check }}</button>
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-4"></div>
+            <div class="col-lg-4"><h3>{{ criminal }}</h3></div>
+            <div class="col-lg-4">
+                <div class="row">
+                    <div class="col-lg-4"></div>
+                    <div class="col-lg-3"></div>
+                    {% if criminal.check %}
+                    <div class="col-lg-5 bg-success rounded text-light"><h6>Подтвержден</h6></div>
+                    {% else %}
+                    <div class="col-lg-5 bg-warning rounded text-light"><h6>Не подтвержден</h6></div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
     <!-- навбар -->
-    <div class="col-lg-3 border-top bg-dark border-right justify-content-center px-2 pt-2">
-        <div class="">
+    <div class="col-lg-3 border-top border-right justify-content-center px-2 pt-2">
+        <div class="row mb-2 ">
             <img src="{% static 'homepage/images/no_photo.jpg' %}" class="rounded border border-primary" width="300"
                  height="300">
         </div>
-        <hr>
-        <a href="{{ criminal.get_relative_add_url }}" class="btn btn-outline-success btn-sm btn-block">Добавить
-            родственника</a>
-        <a href="{{ criminal.get_contact_person_add_url }}" class="btn btn-outline-primary btn-sm btn-block">Добавить
-            контактируемое лицо</a>
-        <a href="{{ criminal.get_address_add_url }}" class="btn btn-outline-primary btn-sm btn-block">Добавить
-            адресс</a>
-        <a href="{{ criminal.get_contact_add_url }}" class="btn btn-outline-primary btn-sm btn-block">Добавить
-            контактные данные</a>
-        <a href="{{ criminal.get_criminal_case_add_url }}" class="btn btn-outline-primary btn-lg btn-block">Добавить
-            уголовное дело</a>
-        <a href="{{ criminal.get_manhunt_add_url }}" class="btn btn-outline-primary btn-lg btn-block">Добавить розыскное
-            дело</a>
-        <a href="{{ criminal.get_conviction_add_url }}" class="btn btn-outline-primary btn-lg btn-block">Добавить
-            судимость</a>
-        <br>
+        {% if not request.user.profile.role_id.role_type == 'staff' %}
+        <div class="row px-2 pt-2 pb-2 bg-dark rounded">
+            <hr>
+
+            {% include 'persons/includes/incl_criminal_navbar_add_buttons.html' %}
+
+            <br>
+        </div>
+
+        {% endif %}
     </div>
     <!-- досье -->
     <div class="col-lg-7 border-top">
@@ -87,24 +100,51 @@
     </div>
     <!-- информация -->
     <div class="col-lg-2 border-left border-top pt-2">
+        {% if not criminal.check %}
+        {% if request.user.is_superuser or request.user.profile.role_id.role_type == 'head'%}
+        <a href="{{ criminal.get_criminal_check_url }}" class="btn btn-success btn-block ">Подтвердить</a>
+        {% endif %}
+        {% endif %}
+        {% if criminal.owner == request.user.profile or request.user.is_superuser %}
         <a href="{{ criminal.get_update_url }}" class="btn btn-success btn-block ">Редактировать</a>
+        {% endif %}
+        {% if request.user.is_superuser %}
         <a href="{{ criminal.get_delete_url }}" class="btn btn-danger btn-block ">Удалить</a>
+        {% endif %}
         <a href="" class="btn btn-success btn-block ">Печать</a>
         <br>
         <div class="row m-0 p-0">
-            <span>Владелец:</span>
+            <span class="mx-2">Владелец:</span>
             <a href="#" class="text-muted">{{criminal.owner}}</a>
-            <span>Создан:</span>
+            <span class="mx-2">Создан:</span>
             <a href="">{{criminal.user}}</a>
-            <span>Дата создания:</span>
+            <span class="mx-2">Дата создания:</span>
             <span class="text-primary">{{criminal.created}}</span>
-            <span>Уровень секретности:</span>
+            <span class="mx-2">Уровень секретности:</span>
+            {% if criminal.confident %}
             <span class="text-primary">{{criminal.confident}}</span>
+            {% else %}
+            <span class="text-primary">Открытая информация</span>
+            {% endif %}
+            {% if criminal.owner == request.user.profile or request.user.is_superuser %}
+            <a href="{{ criminal.get_criminal_confident_change_url }}" class="btn btn-primary btn-sm btn-block">Изменить
+                уровень секретности</a>
+            {% endif %}
+            {% if request.user.is_superuser %}
+            <a href="{{ criminal.get_criminal_change_owner_url }}" class="btn btn-secondary btn-sm btn-block">Сменить
+                владельцца</a>
+            {% endif %}
         </div>
         <hr>
         <div class="row m-0 p-0">
-            <span>Доступ</span>
-            <a href="" class="btn btn-danger btn-sm btn-block">Закрыть доступ</a>
+            {% if criminal.owner == request.user.profile or request.user.is_superuser %}
+            {% if criminal.close == False%}
+            <a href="{{ criminal.get_criminal_close_change_url }}" class="btn btn-danger btn-sm btn-block">Закрыть
+                доступ</a>
+            {% else %}
+            <a href="{{ criminal.get_criminal_close_change_url }}" class="btn btn-warning btn-sm btn-block">Открыть
+                доступ</a>
+            {% endif %}
             <a href="{{ criminal.get_group_access_create_url }}" class="btn btn-success btn-sm btn-block">Открыть
                 групповой доступ</a>
             <a href="{{ criminal.get_personal_access_create_url }}" class="btn btn-success btn-sm btn-block">Открыть
@@ -114,11 +154,12 @@
                 <span>Группы:</span>
             </div>
             <span>Сотрудники:</span>
-
+            {% endif %}
         </div>
     </div>
 
 </div>
+
 
 {% if address %}
 <div class="row rounded border mb-5">
@@ -259,7 +300,7 @@
     </div>
 </div>
 {% endif %}
-
+{% if manhunt %}
 <div class="row rounded border mb-5">
     <div class="col-lg-12 round">
         <div class="row d-flex bg-dark justify-content-center text-align-center">
@@ -285,5 +326,6 @@
         {% endfor %}
     </div>
 </div>
+{% endif %}
 
 {% endblock content_wrapper %}

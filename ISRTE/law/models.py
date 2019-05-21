@@ -23,6 +23,9 @@ class CriminalCase(models.Model):
     def __str__(self):
         return self.number + '/' + self.year
 
+    def get_absolute_url(self):
+        return reverse('cc_detail', kwargs={'pk': self.id})
+
 
 class CriminalCaseCriminals(models.Model):
     criminal_case = models.ForeignKey(CriminalCase, verbose_name='Уголовное дело', on_delete=models.CASCADE)
@@ -59,6 +62,12 @@ class Manhunt(models.Model):
 
     def __str__(self):
         return self.invest_case_number
+
+    def get_absolute_url(self):
+        return reverse('manhunt-detail_url', kwargs={'pk': self.id})
+
+    def get_update_url(self):
+        return reverse('manhunt_update_url', kwargs={'pk': self.id})
 
 
 class Conviction(models.Model):

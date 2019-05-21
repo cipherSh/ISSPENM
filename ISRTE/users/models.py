@@ -18,7 +18,7 @@ class Role(models.Model):
 
 class TrustLevel(models.Model):
     trust_level = models.CharField(max_length=200, verbose_name='Уровень доверия/конфиденциальность')
-    level = models.IntegerField(verbose_name='Уровень')
+    level = models.IntegerField(verbose_name='Уровень', unique=True)
 
     def __str__(self):
         return self.trust_level
@@ -27,8 +27,9 @@ class TrustLevel(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role_id = models.ForeignKey(Role, verbose_name='Роль пользователя', on_delete=models.SET_NULL, null=True)
-    trust_level_id = models.ForeignKey(TrustLevel, verbose_name='Уровень доверия', on_delete=models.SET_NULL, null=True)
-    birth_date = models.DateField(null=True, blank=True)
+    trust_level_id = models.ForeignKey(TrustLevel, verbose_name='Уровень доверия', on_delete=models.SET_NULL, null=True,
+                                       blank=True)
+    birth_date = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
 
     class Meta:
         verbose_name = "Профиль"
@@ -38,7 +39,8 @@ class Profile(models.Model):
         return self.user.last_name + ' ' + self.user.first_name
 
     def get_absolute_url(self):
-        return reverse('single_profile', kwargs={'user': self.user.id})
+        return reverse('user_profile_url', kwargs={'pk': self.user.id})
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

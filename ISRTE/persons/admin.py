@@ -7,7 +7,7 @@ from .models import Criminals, Persons, CriminalAddresses, ContactRelation, Cont
 
 @admin.register(Criminals)
 class CriminalsAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name', 'birthday')
+    list_display = ('last_name', 'first_name', 'patronymic', 'INN')
     list_filter = ('status', 'marital_status')
 
 

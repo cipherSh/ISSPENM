@@ -15,8 +15,8 @@ class GroupAccess(models.Model):
         verbose_name = 'Групповой доступ'
         verbose_name_plural = 'Групповой доступ'
 
-    def __int__(self):
-        return self.doc_id + ' -- ' + self.group_id
+    def __str__(self):
+        return str(self.doc_id) + ' -- ' + str(self.group_id)
 
     def get_absolute_url(self):
         return reverse('group_access_url', kwargs={'pk_access': self.id})
@@ -31,6 +31,6 @@ class PersonAccess(models.Model):
         verbose_name = 'Персональный доступ'
         verbose_name_plural = 'Персональный доступ'
 
-    def __int__(self):
-        return self.doc_id + " -- " + self.user_id
+    def __str__(self):
+        return str(self.doc_id) + " -- " + str(self.user_id)
 

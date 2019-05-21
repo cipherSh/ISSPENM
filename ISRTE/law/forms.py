@@ -22,6 +22,13 @@ class CriminalManhuntAddForm(forms.ModelForm):
                   'date_detention', 'invest_stopped_circular']
 
 
+class CriminalManhuntUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Manhunt
+        fields = ['invest_case_number', 'criminal_id', 'criminalCase_id', 'date_arousal', 'invest_initiator', 'invest_category',
+                  'circular_number', 'preventive', 'date_inter_invest', 'invest_stopped', 'place_detention',
+                  'date_detention', 'invest_stopped_circular']
+
 class CriminalConvictionAddForm(forms.ModelForm):
     class Meta:
         model = Conviction

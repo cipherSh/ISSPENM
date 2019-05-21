@@ -1,52 +1,50 @@
-{% extends "base.html" %}
-{% block content %}
-    <div class="row">
-        {% if perms.auth.add_user %}
-        <a class="btn" href="/users/create/">Добавить</a>
-        {% endif %}
+{% extends "users_wrapper.html" %}
+{% block page%}Пользователи{% endblock %}
+{% block content_wrapper %}
+
+
+<div class="row bg-secondary">
+    <div class="col-md col-lg">
+        <p class="font-weight-bold">Логин</p>
     </div>
-    <div class="row bg-secondary">
-        <div class="col-md col-lg">
-            <p class="font-weight-bold">Логин</p>
-        </div>
-        <div class="col-md col-lg">
-            <p class="font-weight-bold">ФИО</p>
-        </div>
-        <div class="col-md col-lg">
-            <p class="font-weight-bold">Роль</p>
-        </div>
-        {% if user.is_superuser %}
-        <div class="col-md col-lg">
-            <p class="font-weight-bold">Уровень доверия</p>
-        </div>
-        {% endif %}
-        {% if perms.auth %}
-        <div class="col-md col-lg">
-            <p class="font-weight-bold">Действие</p>
-        </div>
-        {% endif %}
+    <div class="col-md col-lg">
+        <p class="font-weight-bold">ФИО</p>
     </div>
-    {% for user in users %}
-        <div class="row">
-            <div class="col-md col-lg">
-                <a class="text-muted" href="{{ user.get_absolute_url }}">{{ user.user }}</a>
-            </div>
-            <div class="col-md col-lg">
-                <a class="text-muted" href="#">{{ user.user.last_name }} {{ user.user.first_name }}</a></h2>
-            </div>
-            <div class="col-md col-lg">
-                <p class="text-muted">{{ user.role_id }}</p>
-            </div>
-            {% if request.user.is_superuser %}
-            <div class="col-md col-lg">
-                <p class="text-muted">{{ user.trust_level_id }}</p>
-            </div>
-            {% endif %}
-            {% if perms.auth %}
-            <div class="col-md col-lg">
-                <p class="text-muted">ыв</p>
-            </div>
-            {% endif %}
-        </div>
-    {% endfor %}
-{% endblock content %}
+    <div class="col-md col-lg">
+        <p class="font-weight-bold">Роль</p>
+    </div>
+    {% if user.is_superuser %}
+    <div class="col-md col-lg">
+        <p class="font-weight-bold">Уровень доверия</p>
+    </div>
+    {% endif %}
+    {% if perms.auth %}
+    <div class="col-md col-lg">
+        <p class="font-weight-bold">Действие</p>
+    </div>
+    {% endif %}
+</div>
+{% for user in users %}
+<div class="row">
+    <div class="col-md col-lg">
+        <a class="text-muted" href="{{user.get_absolute_url}}">{{ user.user }}</a>
+    </div>
+    <div class="col-md col-lg">
+        <a class="text-muted" href="#">{{ user.user.last_name }} {{ user.user.first_name }}</a></h2>
+    </div>
+    <div class="col-md col-lg">
+        <p class="text-muted">{{ user.role_id }}</p>
+    </div>
+    {% if request.user.is_superuser %}
+    <div class="col-md col-lg">
+        <p class="text-muted">{{ user.trust_level_id }}</p>
+    </div>
+    {% endif %}
+    {% if perms.auth %}
+    <div class="col-md col-lg">
+        <p class="text-muted">ыв</p>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock content_wrapper %}

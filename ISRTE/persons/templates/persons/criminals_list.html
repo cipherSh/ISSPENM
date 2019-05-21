@@ -1,50 +1,55 @@
 {% extends "persons/wrapper.html" %}
-
+{% load static %}
+{% block show_list %}
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"></div>
+    <div class="col-lg-2"><a href="{% url 'criminals_list' %}">Показать весь список</a></div>
+</div>
+{% endblock %}
 {% block content_wrapper %}
 
 <!-- Название страницы -->
 <!-- Название стобцов-->
-<div class="row">
-    <div class="col-lg-9" style="margin-right:100px">
-        <div class="row rounded bg-secondary">
-            <div class="col-md-4 col-lg-4">
-                <p class="font-weight-bold">ФИО</p>
-            </div>
-            <div class="col-md-3 col-lg-2">
-                <p class="font-weight-bold">Дата рождения</p>
-            </div>
-            <div class="col-md-2 col-lg-2">
-                <p class="font-weight-bold">ИНН</p>
-            </div>
-            <div class="col-md-2 col-lg-2">
-                <p class="font-weight-bold">ИНН</p>
-            </div>
+<div class="row border p-3" style="min-height:570px">
+    <div class="col-lg-12" style="margin-right:100px">
+        <div class="row border-bottom bg-secondary rounded text-light">
+            <div class="col-md-4 col-lg-4">ФИО</div>
+            <div class="col-md-3 col-lg-3">Дата рождения</div>
+            <div class="col-md-2 col-lg-3">ИНН</div>
+            <div class="col-md-2 col-lg-2">Доступ</div>
         </div>
 
         <!-- Список террористов -->
         {%for criminal in criminals %}
 
-        <div class="row">
+        <div class="row border-bottom">
             <div class="col-md-4 col-lg-4">
-                <a class="text-muted" href="{{criminal.get_absolute_url}}"> {{criminal.last_name}}
-                    {{criminal.first_name}} {{criminal.patronymic}}</a></h2>
+                <a class="text-muted" href="{{criminal.get_absolute_url}}">{{criminal}}</a>
             </div>
-            <div class="col-md-3 col-lg-2">
-                <p class="text-muted">{{ criminal.birthday }}</p>
-            </div>
-            <div class="col-md-2 col-lg-2">
-                <p class="text-muted">{{ criminal.INN }}</p>
-            </div>
-            <div class="col-md-2 col-lg-2">
-                <p class="text-muted">{{ criminal.INN }}</p>
+            <div class="col-md-3 col-lg-3">{{ criminal.birthday }}</div>
+            <div class="col-md-2 col-lg-3">{{ criminal.INN }}</div>
+            <div class="col-md-2 col-lg-2 bg-light m-0 p-0">
+                <div class="row">
+                    <div class="col text-success font-weight-bold">
+                        <img src="{% static 'access/icon_view.png' %}" alt="">
+                        <img src="{% static 'access/icon_redact.png' %}" alt="">
+                        <img src="{% static 'access/icon_execute.png' %}" alt="">
+                        <img src="{% static 'access/icon_access_open.png' %}" alt="">
+                        <img src="{% static 'access/icon_access_close.png' %}" alt="">
+                    </div>
+                    <div class="col-lg-4 "><a href="" class="m-0 btn btn-outline-primary btn-sm btn-block p-0">Запрос</a></div>
+                </div>
             </div>
         </div>
-
         {% endfor %}
+
+
     </div>
-    <div class="col-lg-2 btn">
-        <a href="create/" class="btn btn-success">Добавить</a>
-    </div>
+
 </div>
 
 

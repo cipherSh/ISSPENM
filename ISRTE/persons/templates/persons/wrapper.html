@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="row blog-header navbar-container bg-dark rounded text-light justify-content-center">
-        <a class="navbar-brand">Реестр</a>
+    <div class="row blog-header navbar-container bg-dark rounded text-light justify-content-center mb-4">
+        <div class="col-lg-5"></div>
+        <div class="col-lg-3"><h4>Реестр</h4></div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-2 p-1">
+            <a href="{% url 'criminal_create_url'%}" class="btn btn-outline-light btn-sm btn-block">Добавить</a>
+        </div>
     </div>
-    <hr>
     <!--Поиск -->
-        <form action="/persons/search/" method="get">
+        <form action="{% url 'criminals_list' %}" method="get">
             <div class="row form-group">
                 <div class="col-lg-11 m-0">
-                    <input type="text" class="form-control" name="text">
+                    <input type="text" class="form-control" name="search_criminal">
                 </div>
                 <div class="col-lg-1 m-0">
                     <input type="submit" class="btn btn-primary" value="Поиск">
                 </div>
             </div>
         </form>
-    <hr>
+        {% block show_list %}
+
+        {% endblock %}
     <div class="row" style="min-height:600px">
         <div class="col-md-9 col-lg-12 content-container pl-4 pt-2 pr-4">
             {% block content_wrapper %}

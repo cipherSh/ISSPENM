@@ -1,7 +1,7 @@
 {% extends "persons/wrapper.html" %}
 
 {% block content_wrapper %}
-    <form action="{% url 'group_access_create_url' pk=criminal.id %}" method="post">
+    <form action="{% url 'personal_access_create_url' pk=criminal.id %}" method="post">
 
         <p>Групповой доступ к досье <b>{{ criminal }}</b></p>
         {% csrf_token %}

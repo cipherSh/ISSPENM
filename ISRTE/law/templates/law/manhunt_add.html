@@ -3,7 +3,7 @@
 {% block content_wrapper %}
 <div class="row"><h1>Добавление розыскное дело на <b>{{criminal}}</b></h1></div>
 <br>
-    <form action="{% url 'manhunt_add_url' pk=criminal.id%}" method="post">
+    <form action="{% url 'manhunt_update_url' pk=manhunt.id %}" method="post">
         {% csrf_token %}
         {% for field in form %}
 

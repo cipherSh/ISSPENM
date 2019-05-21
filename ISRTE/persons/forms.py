@@ -44,3 +44,15 @@ class CriminalContactDetailAddForm(forms.ModelForm):
         model = Contacts
         fields = ['type_contact', 'contact', 'remarks']
 
+
+class CriminalOwnerChangeForm(forms.ModelForm):
+    class Meta:
+        model = Criminals
+        fields = ['owner']
+
+
+class CriminalConfidentChangeForm(forms.ModelForm):
+    class Meta:
+        model = Criminals
+        fields = ['confident']
+

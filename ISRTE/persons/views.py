@@ -2,16 +2,16 @@ from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.generic import View
+from django.db.models import Q
 
-#models
+# models
 from .models import Criminals, Persons, CriminalAddresses, Contacts, CriminalsRelatives, CriminalsContactPersons
 from access.models import PersonAccess, GroupAccess
 from law.models import Conviction, CriminalCaseCriminals, CriminalCase, Manhunt, Confluence
 
-#forms
-from .forms import CriminalCreateForm, PersonsCreateForm, CriminalAddRelativeForm, CriminalAddContactPersonForm,\
-    CriminalAddAddressForm, CriminalContactDetailAddForm
-
+# forms
+from .forms import CriminalCreateForm, PersonsCreateForm, CriminalAddRelativeForm, CriminalAddContactPersonForm, \
+    CriminalAddAddressForm, CriminalContactDetailAddForm, CriminalOwnerChangeForm, CriminalConfidentChangeForm
 
 
 # Create your views here.
@@ -21,9 +21,69 @@ def record(request):
 
 
 @login_required
+def criminals_page(request):
+    criminals = Criminals.objects.order_by('-created')[:10]
+    my_docs = Criminals.objects.filter(owner=request.user.profile).order_by('-created')[:10]
+    uncheck_docs = Criminals.objects.filter(check=False).order_by('-created')[:10]
+    context = {
+        'criminals': criminals,
+        'my_docs': my_docs,
+        'uncheck_docs': uncheck_docs
+    }
+    return render(request, "persons/criminals_page.html", context=context)
+
+
+@login_required
+def criminal_my_docs(request):
+    my_docs = Criminals.objects.filter(owner=request.user.profile).order_by('-created')
+    context = {
+        'my_docs': my_docs
+    }
+    return render(request, "persons/criminals_page.html", context=context)
+
+
+@login_required
+def criminal_uncheck_docs(request):
+    uncheck_docs = Criminals.objects.filter(check=False).order_by('-created')[:10]
+    context = {
+        'uncheck_docs': uncheck_docs
+    }
+    return render(request, "persons/criminals_page.html", context=context)
+
+
+@login_required
 def criminals_list(request):
-    criminals = Criminals.objects.all()
-    return render(request, "persons/criminals_list.html", {"criminals": criminals})
+    search_query = request.GET.get('search_criminal', '')
+
+    if search_query:
+        criminals = Criminals.objects.filter(Q(full_name__icontains=search_query) | Q(INN__icontains=search_query))
+    else:
+        criminals = Criminals.objects.all()
+    my_docs = Criminals.objects.filter(owner=request.user.profile)
+    context = {
+        'criminals': criminals,
+        'my_docs': my_docs
+    }
+    return render(request, "persons/criminals_list.html", context=context)
+
+
+@login_required
+def criminal_close_change(request, pk):
+    criminal = Criminals.objects.get(id=pk)
+    if criminal.close == False:
+        criminal.close = True
+    else:
+        criminal.close = False
+    criminal.save()
+    return redirect(criminal)
+
+
+@login_required
+def criminal_check(request, pk):
+    criminal = Criminals.objects.get(id=pk)
+    criminal.check = True
+    criminal.save()
+    return redirect(criminal)
 
 
 @login_required
@@ -48,9 +108,16 @@ def criminal_single(request, pk):
         'criminal_case': criminal_case
     }
     if not request.user.is_superuser:
-        if PersonAccess.objects.filter(doc_id=pk).filter(user_id=request.user.id):
-            criminal = get_object_or_404(Criminals, id=pk)
+
+        if criminal.owner == request.user.profile:
             return render(request, "persons/criminal_single.html", context=context)
+
+        elif criminal.close == True:
+            return render(request, "persons/sorry.html")
+
+        elif PersonAccess.objects.filter(doc_id=pk).filter(user_id=request.user.id):
+            return render(request, "persons/criminal_single.html", context=context)
+
         else:
             gr = request.user.groups.all()
             ans = False
@@ -58,7 +125,6 @@ def criminal_single(request, pk):
                 if GroupAccess.objects.filter(doc_id=pk).filter(group_id=g.id):
                     ans = True
             if ans:
-                criminal = get_object_or_404(Criminals, id=pk)
                 return render(request, "persons/criminal_single.html", context=context)
             return render(request, "persons/sorry.html", {"gr": gr})
     return render(request, "persons/criminal_single.html", context=context)
@@ -84,7 +150,6 @@ def record_main_page(request):
 def search_form(request):
     return render(request, 'persons/search.html')
 
-
 def search(request):
     if 'text' in request.GET and request.GET['text']:
         q = request.GET['text']
@@ -106,6 +171,8 @@ class CriminalCreate(View):
             new_criminal = bound_form.save(commit=False)
             new_criminal.user = request.user.profile
             new_criminal.owner = request.user.profile
+            new_criminal.full_name = new_criminal.last_name + ' ' + new_criminal.first_name + ' ' + \
+                                     new_criminal.patronymic
             new_criminal.save()
             return redirect(new_criminal)
         return render(request, 'persons/criminal_create.html', context={'form': bound_form})
@@ -152,7 +219,8 @@ class CriminalContactDetailAddView(View):
             new_contact.criminal_id = criminal
             new_contact.save()
             return redirect(criminal)
-        return render(request, 'persons/add/criminal_contact_add.html', context={'form': bound_form, 'criminal': criminal})
+        return render(request, 'persons/add/criminal_contact_add.html',
+                      context={'form': bound_form, 'criminal': criminal})
 
 
 class CriminalAddressAdd(View):
@@ -208,8 +276,8 @@ class CriminalAddContactPersonView(View):
         person_form = PersonsCreateForm()
         add_form = CriminalAddContactPersonForm()
         return render(request, 'persons/add/criminal_add_contact-person.html', context={'person_form': person_form,
-                                                                                  'add_form': add_form,
-                                                                                  'criminal': criminal})
+                                                                                        'add_form': add_form,
+                                                                                        'criminal': criminal})
 
     def post(self, request, pk):
         bound_add_form = CriminalAddContactPersonForm(request.POST)
@@ -225,6 +293,41 @@ class CriminalAddContactPersonView(View):
             new_add.person_id = new_person
             new_add.save()
             return redirect(criminal)
-        return render(request, 'persons/add/criminal_add_contact-person.html', context={'person_form': bound_person_form,
-                                                                                  'add_form': bound_add_form,
+        return render(request, 'persons/add/criminal_add_contact-person.html',
+                      context={'person_form': bound_person_form,
+                               'add_form': bound_add_form,
+                               'criminal': criminal})
+
+
+class CriminalOwnerChangeView(View):
+    def get(self, request, pk):
+        criminal = Criminals.objects.get(id=pk)
+        bound_form = CriminalOwnerChangeForm(instance=criminal)
+        return render(request, 'persons/add/criminal_owner_change.html', context={'form': bound_form,
                                                                                   'criminal': criminal})
+
+    def post(self, request, pk):
+        criminal = Criminals.objects.get(id=pk)
+        bound_form = CriminalOwnerChangeForm(request.POST, instance=criminal)
+        if bound_form.is_valid():
+            bound_form.save()
+            return redirect(criminal)
+        return render(request, 'persons/add/criminal_owner_change.html', context={'form': bound_form,
+                                                                                  'criminal': criminal})
+
+
+class CriminalConfidentChangeView(View):
+    def get(self, request, pk):
+        criminal = Criminals.objects.get(id=pk)
+        bound_form = CriminalConfidentChangeForm(instance=criminal)
+        return render(request, 'persons/add/criminal_confident_change.html', context={'form': bound_form,
+                                                                                      'criminal': criminal})
+
+    def post(self, request, pk):
+        criminal = Criminals.objects.get(id=pk)
+        bound_form = CriminalConfidentChangeForm(request.POST, instance=criminal)
+        if bound_form.is_valid():
+            bound_form.save()
+            return redirect(criminal)
+        return render(request, 'persons/add/criminal_confident_change.html', context={'form': bound_form,
+                                                                                      'criminal': criminal})

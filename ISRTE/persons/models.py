@@ -70,6 +70,8 @@ class Criminals(models.Model):
     first_name = models.CharField(max_length=200, verbose_name='Имя')
     last_name = models.CharField(max_length=200, verbose_name='Фамилия')
     patronymic = models.CharField(max_length=200, blank=True, verbose_name='Отчетство')
+    full_name = models.CharField(max_length=600, blank=True, null=True, default='',
+                                 verbose_name='Полное имя')
     birthday = models.DateField(verbose_name='Дата рождение', auto_now_add=False, blank=True)
     birth_country = models.CharField(max_length=200, verbose_name='Страна рождения', null=True, blank=True)
     birth_region = models.CharField(max_length=200, verbose_name='Область', null=True, blank=True)
@@ -176,6 +178,18 @@ class Criminals(models.Model):
 
     def get_manhunt_add_url(self):
         return reverse('manhunt_add_url', kwargs={'pk': self.id})
+
+    def get_criminal_close_change_url(self):
+        return reverse('criminal_close_change_url', kwargs={'pk': self.id})
+
+    def get_criminal_check_url(self):
+        return reverse('criminal_check_url', kwargs={'pk': self.id})
+
+    def get_criminal_change_owner_url(self):
+        return reverse('criminal_change_owner_url', kwargs={'pk': self.id})
+
+    def get_criminal_confident_change_url(self):
+        return reverse('criminal_confident_change_url', kwargs={'pk': self.id})
 
 
 class Persons(models.Model):

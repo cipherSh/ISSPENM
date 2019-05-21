@@ -2,15 +2,39 @@ from django.shortcuts import render, redirect
 from django.views.generic import View
 
 #models
-from .models import Conviction
+from .models import Conviction, CriminalCase, CriminalCaseCriminals, Manhunt
 from persons.models import Criminals
 
 #forms
 from .forms import CriminalConvictionAddForm, CriminalCaseCreateForm, CriminalsCriminalCaseAddForm, \
-    CriminalManhuntAddForm
+    CriminalManhuntAddForm, CriminalManhuntUpdateForm
 
 
 # Create your views here.
+
+def cc_list(request):
+    cc = CriminalCase.objects.all()
+    return render(request, 'law/criminal_case_list.html', context={'case_list': cc})
+
+
+def cc_detail(request, pk):
+    cc = CriminalCase.objects.get(id=pk)
+    ccm = CriminalCaseCriminals.objects.filter(criminal_case=cc)
+    context = {
+        'case': cc,
+        'ccm': ccm
+    }
+    return render(request, 'law/cc-detail.html', context=context)
+
+
+def manhunt_list(request):
+    manhunts = Manhunt.objects.order_by('date_arousal')
+    return render(request, 'law/manhunt_list.html', context={'manhunts': manhunts})
+
+
+def manhunt_detail(request, pk):
+    manhunt = Manhunt.objects.get(id=pk)
+    return render(request, 'law/manhunt-detail.html', context={'manhunt': manhunt})
 
 
 class CriminalConvictionAddView(View):
@@ -95,3 +119,27 @@ class CriminalManhuntAddView(View):
             new_manhunt.save()
             return redirect(criminal)
         return render(request, 'law/manhunt_add.html', context=context)
+
+
+class ManhuntUpdateView(View):
+    def get(self, request, pk):
+        manhunt = Manhunt.objects.get(id=pk)
+        form = CriminalManhuntUpdateForm(instance=manhunt)
+
+        context = {
+            'manhunt': manhunt,
+            'form': form,
+        }
+        return render(request, 'law/manhunt_update.html', context=context)
+
+    def post(self, request, pk):
+        manhunt = Manhunt.objects.get(id=pk)
+        bound_form = CriminalManhuntUpdateForm(request.POST)
+        context = {
+            'manhunt': manhunt,
+            'form': bound_form,
+        }
+        if bound_form.is_valid():
+            new_manhunt = bound_form.save()
+            return redirect(new_manhunt)
+        return render(request, 'law/manhunt_update.html', context=context)
